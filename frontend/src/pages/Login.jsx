@@ -20,7 +20,7 @@ function Login() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://minekey-backend.onrender.com/api/auth/login",
         {
           email: loginEmail,
           password: loginPassword,

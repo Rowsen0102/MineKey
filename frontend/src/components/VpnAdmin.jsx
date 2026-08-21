@@ -12,7 +12,7 @@ function VpnAdmin() {
   const getVpnList = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/vpn/all",
+        "https://minekey-backend.onrender.com/api/vpn/all",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -35,7 +35,7 @@ function VpnAdmin() {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/vpn/${id}`,
+        `https://minekey-backend.onrender.com/api/vpn/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ function VpnAdmin() {
   const saveVpn = async () => {
     try {
       await axios.put(
-        `http://localhost:5000/api/vpn/${editingId}`,
+        `https://minekey-backend.onrender.com/api/vpn/${editingId}`,
         {
           vpn_key: vpnKey,
           country,
@@ -79,7 +79,7 @@ function VpnAdmin() {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/vpn/release/${id}`,
+        `https://minekey-backend.onrender.com/api/vpn/release/${id}`,
         {},
         {
           headers: {

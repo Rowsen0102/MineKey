@@ -30,7 +30,7 @@ function Profile() {
       }
 
       const res = await axios.get(
-        "http://localhost:5000/api/auth/profile",
+        "https://minekey-backend.onrender.com/api/auth/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ function Profile() {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "http://localhost:5000/api/admin/stats",
+      "https://minekey-backend.onrender.com/api/admin/stats",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const uploadAvatar = async () => {
     formData.append("avatar", avatar);
 
     await axios.post(
-      "http://localhost:5000/api/auth/avatar",
+      "https://minekey-backend.onrender.com/api/auth/avatar",
       formData,
       {
         headers: {
@@ -124,7 +124,7 @@ const saveProfile = async () => {
     const token = localStorage.getItem("token");
 
     await axios.put(
-      "http://localhost:5000/api/auth/profile",
+      "https://minekey-backend.onrender.com/api/auth/profile",
       {
         username: editProfileUsername,
         email: editProfileEmail,
@@ -170,7 +170,7 @@ const saveProfile = async () => {
 
       {profile.avatar && (
         <img
-          src={`http://localhost:5000/uploads/${profile.avatar}`}
+          src={`https://minekey-backend.onrender.com/uploads/${profile.avatar}`}
           alt="avatar"
           style={{
             width: "120px",

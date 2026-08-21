@@ -33,7 +33,7 @@ function Admin() {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "http://localhost:5000/api/auth/profile",
+      "https://minekey-backend.onrender.com/api/auth/profile",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ const getUsers = async () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "http://localhost:5000/api/admin/users",
+      "https://minekey-backend.onrender.com/api/admin/users",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const getStats = async () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.get(
-      "http://localhost:5000/api/admin/stats",
+      "https://minekey-backend.onrender.com/api/admin/stats",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ const deleteUser = async (id) => {
     const token = localStorage.getItem("token");
 
     const res = await axios.delete(
-      `http://localhost:5000/api/admin/users/${id}`,
+      `https://minekey-backend.onrender.com/api/admin/users/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,7 +119,7 @@ const blockUser = async (id) => {
     const token = localStorage.getItem("token");
 
     await axios.put(
-      `http://localhost:5000/api/admin/block/${id}`,
+      `https://minekey-backend.onrender.com/api/admin/block/${id}`,
       {},
       {
         headers: {
@@ -139,7 +139,7 @@ const unblockUser = async (id) => {
     const token = localStorage.getItem("token");
 
     await axios.put(
-      `http://localhost:5000/api/admin/unblock/${id}`,
+      `https://minekey-backend.onrender.com/api/admin/unblock/${id}`,
       {},
       {
         headers: {
@@ -159,7 +159,7 @@ const saveUser = async () => {
     const token = localStorage.getItem("token");
 
     const res = await axios.put(
-      `http://localhost:5000/api/admin/users/${editingUser.id}`,
+      `https://minekey-backend.onrender.com/api/admin/users/${editingUser.id}`,
       {
         username: editUsername,
         email: editEmail,
