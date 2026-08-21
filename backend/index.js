@@ -7,7 +7,7 @@ console.log("DB_PORT =", process.env.DB_PORT);
 console.log("FILE:", __filename);
 const express = require("express");
 const cors = require("cors");
-const { Pool } = require("pg");
+const pool = require("./database/db");
 const authRoutes = require("./routes/authRoutes");
 const fileRoutes = require("./routes/fileRoutes"); 
 const vpnRoutes = require("./routes/vpnRoutes");
@@ -36,12 +36,6 @@ app.use("/api/files", fileRoutes);
 app.use("/api/vpn", vpnRoutes);
 app.use("/api/admin", adminRoutes);
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
 async function createTables() {
 await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
