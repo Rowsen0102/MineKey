@@ -194,3 +194,35 @@ button:hover{
     background:#1565ff;
     border-radius:20px;
 }
+/* =========================
+   Layout для Sidebar
+========================= */
+
+.content{
+    margin-left:270px;
+    padding:30px;
+    min-height:100vh;
+    box-sizing:border-box;
+}
+
+/* Адаптация под мобильные устройства */
+@media (max-width:768px){
+
+    body{
+        padding:20px;
+    }
+
+    .content{
+        margin-left:0;
+        padding:20px;
+    }
+
+    .container{
+        max-width:100%;
+    }
+
+    .stats{
+        flex-direction:column;
+    }
+
+}

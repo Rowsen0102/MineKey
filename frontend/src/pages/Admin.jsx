@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import "./Admin.css";
+
 import Stats from "../components/Stats";
 import UserCard from "../components/UserCard";
 import VpnAdmin from "../components/VpnAdmin";
+import EditUserModal from "../components/EditUserModal";
 
 function Admin() {
   const [profile, setProfile] = useState(null);
@@ -190,8 +193,10 @@ useEffect(() => {
 }, []);
 
   return (
-  <div className="container">
-    <h1>👑 Админ-панель</h1>
+  <div className="admin-page">
+    <h1 className="admin-title">
+    👑 Админ-панель
+</h1>
 
     <Stats stats={stats} />
 
@@ -199,58 +204,84 @@ useEffect(() => {
 
     <h3>Все пользователи</h3>
 
+    <div className="search-box">
     <input
-      type="text"
-      placeholder="Поиск по имени или Email"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
+        type="text"
+        placeholder="🔍 Поиск пользователя..."
+        value={search}
+        onChange={(e)=>setSearch(e.target.value)}
     />
+</div>
 
     <br />
     <br />
 
     {users.length === 0 ? (
-      <p>Пользователей нет</p>
-    ) : (
-      users
-        .filter(
-          (user) =>
-            user.username
-              .toLowerCase()
-              .includes(search.toLowerCase()) ||
-            user.email
-              .toLowerCase()
-              .includes(search.toLowerCase())
-        )
-        .map((user) => (
-          <UserCard
-            key={user.id}
-            user={user}
-            profile={profile}
-            editingUser={editingUser}
-            setEditingUser={setEditingUser}
-            editUsername={editUsername}
-            setEditUsername={setEditUsername}
-            editEmail={editEmail}
-            setEditEmail={setEditEmail}
-            editPassword={editPassword}
-            setEditPassword={setEditPassword}
-            editRole={editRole}
-            setEditRole={setEditRole}
+  <p>Пользователей нет</p>
+) : (
 
-            saveUser={saveUser}
-            deleteUser={deleteUser}
-            blockUser={blockUser}
-            unblockUser={unblockUser}
-          />
-        ))
-    )}
+  <div className="users-grid">
 
+    {users
+      .filter(
+        (user) =>
+          user.username
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          user.email
+            .toLowerCase()
+            .includes(search.toLowerCase())
+      )
+      .map((user) => (
+        <UserCard
+          key={user.id}
+          user={user}
+          profile={profile}
+          editingUser={editingUser}
+          setEditingUser={setEditingUser}
+          editUsername={editUsername}
+          setEditUsername={setEditUsername}
+          editEmail={editEmail}
+          setEditEmail={setEditEmail}
+          editPassword={editPassword}
+          setEditPassword={setEditPassword}
+          editRole={editRole}
+          setEditRole={setEditRole}
+          saveUser={saveUser}
+          deleteUser={deleteUser}
+          blockUser={blockUser}
+          unblockUser={unblockUser}
+        />
+      ))}
+
+  </div>
+
+)}
     <hr />
 
     <VpnAdmin />
 
     {message && <p>{message}</p>}
+    {editingUser && (
+  <EditUserModal
+    editingUser={editingUser}
+    setEditingUser={setEditingUser}
+
+    editUsername={editUsername}
+    setEditUsername={setEditUsername}
+
+    editEmail={editEmail}
+    setEditEmail={setEditEmail}
+
+    editPassword={editPassword}
+    setEditPassword={setEditPassword}
+
+    editRole={editRole}
+    setEditRole={setEditRole}
+
+    saveUser={saveUser}
+  />
+)}
   </div>
 );
 }

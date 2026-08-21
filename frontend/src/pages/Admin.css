@@ -1,0 +1,74 @@
+.admin-page{
+    max-width:1200px;
+    margin:auto;
+    padding:30px;
+}
+
+.admin-title{
+    text-align:center;
+    font-size:38px;
+    color:#17365f;
+    margin-bottom:30px;
+    font-weight:bold;
+}
+
+.search-box{
+    margin:30px 0;
+}
+
+.search-box input{
+    width:100%;
+    padding:15px 20px;
+    border:none;
+    border-radius:15px;
+    background:white;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    font-size:16px;
+}
+
+.search-box input:focus{
+    outline:none;
+    box-shadow:0 0 0 3px rgba(37,99,235,.2);
+}
+
+.users-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+    gap:25px;
+    margin-top:25px;
+}
+
+.section{
+    margin-top:50px;
+}
+
+.section h2{
+    color:#17365f;
+    margin-bottom:20px;
+}
+
+.message{
+    margin-top:20px;
+    padding:15px;
+    border-radius:12px;
+    background:#dcfce7;
+    color:#166534;
+    text-align:center;
+    font-weight:bold;
+}
+
+@media(max-width:768px){
+
+.admin-page{
+    padding:15px;
+}
+
+.users-grid{
+    grid-template-columns:1fr;
+}
+
+.admin-title{
+    font-size:30px;
+}
+
+}

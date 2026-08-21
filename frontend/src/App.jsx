@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import "./App.css";
 
@@ -7,72 +7,67 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
-import Navbar from "./components/Navbar";
+
+import Sidebar from "./components/Sidebar";
 
 function App() {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
   return (
-  <>
-    <Navbar />
+    <>
+      {token && <Sidebar />}
 
-    <Routes>
+      <div className={token ? "content" : ""}>
+        <Routes>
 
-      <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />
 
-      <Route
-        path="/login"
-        element={
-          token ? (
-            <Navigate to="/profile" replace />
-          ) : (
-            <Login />
-          )
-        }
-      />
+          <Route
+            path="/login"
+            element={
+              token
+                ? <Navigate to="/profile" replace />
+                : <Login />
+            }
+          />
 
-      <Route
-        path="/register"
-        element={
-          token ? (
-            <Navigate to="/profile" replace />
-          ) : (
-            <Register />
-          )
-        }
-      />
+          <Route
+            path="/register"
+            element={
+              token
+                ? <Navigate to="/profile" replace />
+                : <Register />
+            }
+          />
 
-      <Route
-        path="/profile"
-        element={
-          token ? (
-            <Profile />
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+          <Route
+            path="/profile"
+            element={
+              token
+                ? <Profile />
+                : <Navigate to="/login" replace />
+            }
+          />
 
-      <Route
-  path="/admin"
-  element={
-    token && role === "admin" ? (
-      <Admin />
-    ) : (
-      <Navigate to="/" replace />
-    )
-  }
-/>
+          <Route
+            path="/admin"
+            element={
+              token && role === "admin"
+                ? <Admin />
+                : <Navigate to="/" replace />
+            }
+          />
 
-      <Route
-        path="*"
-        element={<Navigate to="/" replace />}
-      />
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
 
-    </Routes>
-  </>
-);
+        </Routes>
+      </div>
+    </>
+  );
 }
 
 export default App;

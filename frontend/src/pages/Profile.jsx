@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Dashboard from "../components/Dashboard";
 
 function Profile() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
+  const [stats, setStats] = useState({
+  files: 0,
+  vpn: 0,
+});
   const [message, setMessage] = useState("");
 
   const [avatar, setAvatar] = useState(null);
@@ -41,10 +46,32 @@ function Profile() {
       navigate("/login");
     }
   };
+  const getStats = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(
+      "http://localhost:5000/api/admin/stats",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setStats({
+      files: Number(res.data.files || 0),
+      vpn: Number(res.data.vpn || 0),
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   useEffect(() => {
-    getProfile();
-  }, []);
+  getProfile();
+  getStats();
+}, []);
 
   const logout = () => {
   localStorage.removeItem("token");
@@ -124,6 +151,10 @@ const saveProfile = async () => {
 
   return (
     <div className="container">
+        <Dashboard
+  profile={profile}
+  stats={stats}
+/>
       <h2>Профиль</h2>
 
       <p><b>Имя:</b> {profile.username}</p>
