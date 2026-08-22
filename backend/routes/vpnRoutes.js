@@ -1,4 +1,5 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
@@ -15,25 +16,22 @@ const {
     isAdmin,
 } = require("../middleware/authMiddleware");
 
-// ==================== Пользователь ====================
-
-// Добавить VPN
-router.post(
-    "/add",
-    authMiddleware,
-    addVpnKey
-);
-
-// Получить свободный VPN
+// Получить VPN
 router.get(
     "/get",
     authMiddleware,
     getFreeVpnKey
 );
 
-// ==================== Администратор ====================
+// Добавить VPN
+router.post(
+    "/add",
+    authMiddleware,
+    isAdmin,
+    addVpnKey
+);
 
-// Получить все VPN
+// Все VPN
 router.get(
     "/all",
     authMiddleware,
@@ -41,7 +39,7 @@ router.get(
     getAllVpnKeys
 );
 
-// Обновить VPN
+// Обновить
 router.put(
     "/:id",
     authMiddleware,
@@ -49,7 +47,7 @@ router.put(
     updateVpnKey
 );
 
-// Удалить VPN
+// Удалить
 router.delete(
     "/:id",
     authMiddleware,
@@ -57,7 +55,7 @@ router.delete(
     deleteVpnKey
 );
 
-// Освободить VPN
+// Освободить
 router.put(
     "/release/:id",
     authMiddleware,
