@@ -23,6 +23,7 @@ const {
     profile,
     uploadAvatar,
     updateProfile,
+    getUserStats,
 } = require("../controllers/authController");
 console.log("authMiddleware:", typeof authMiddleware);
 console.log("profile:", typeof profile);
@@ -30,6 +31,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.get("/profile", authMiddleware, profile);
 router.put("/profile", authMiddleware, updateProfile);
+router.get("/stats", authMiddleware, getUserStats);
 router.post(
     "/avatar",
     authMiddleware,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../api";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -19,8 +19,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "https://minekey-backend.onrender.com/api/auth/login",
+      const res = await API.post(
+        "/auth/login",
         {
           email: loginEmail,
           password: loginPassword,

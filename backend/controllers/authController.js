@@ -228,6 +228,31 @@ const updateProfile = async (req, res) => {
         });
     }
 };
+const getUserStats = async (req, res) => {
+    try {
+        const filesResult = await pool.query(
+            "SELECT COUNT(*) FROM files WHERE user_id = $1",
+            [req.user.id]
+        );
+
+        const vpnResult = await pool.query(
+            "SELECT COUNT(*) FROM vpn_keys WHERE user_id = $1",
+            [req.user.id]
+        );
+
+        res.json({
+            files: Number(filesResult.rows[0].count),
+            vpn: Number(vpnResult.rows[0].count),
+        });
+
+    } catch (err) {
+        console.error("USER STATS ERROR:", err);
+
+        res.status(500).json({
+            error: err.message,
+        });
+    }
+};
 
 module.exports = {
     register,
@@ -235,4 +260,5 @@ module.exports = {
     profile,
     uploadAvatar,
     updateProfile,
+    getUserStats,
 };

@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import Files from "./pages/Files";
 
 import Sidebar from "./components/Sidebar";
 
@@ -58,6 +59,15 @@ function App() {
                 : <Navigate to="/" replace />
             }
           />
+
+          <Route
+  path="/files"
+  element={
+    token
+      ? <Files />
+      : <Navigate to="/login" replace />
+  }
+/>
 
           <Route
             path="*"

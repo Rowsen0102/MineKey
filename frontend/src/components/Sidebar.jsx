@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   FaHome,
   FaUser,
+  FaFolder,
   FaUsersCog,
   FaSignOutAlt,
 } from "react-icons/fa";
@@ -10,7 +11,6 @@ import "./Sidebar.css";
 
 function Sidebar() {
   const location = useLocation();
-
   const role = localStorage.getItem("role");
 
   const logout = () => {
@@ -19,46 +19,63 @@ function Sidebar() {
   };
 
   return (
-    <div className="sidebar">
-      <h2 className="logo">
-        🔐 MineKey
-      </h2>
+    <aside className="sidebar">
 
-      <nav>
+      <div className="sidebar-top">
 
-        <Link
-          to="/"
-          className={location.pathname === "/" ? "active" : ""}
-        >
-          <FaHome />
-          <span>Главная</span>
-        </Link>
+        <h2 className="logo">
+          🔐 <span>MineKey</span>
+        </h2>
 
-        <Link
-          to="/profile"
-          className={location.pathname === "/profile" ? "active" : ""}
-        >
-          <FaUser />
-          <span>Профиль</span>
-        </Link>
+        <nav>
 
-        {role === "admin" && (
           <Link
-            to="/admin"
-            className={location.pathname === "/admin" ? "active" : ""}
+            to="/"
+            className={location.pathname === "/" ? "active" : ""}
           >
-            <FaUsersCog />
-            <span>Админ</span>
+            <FaHome />
+            <span>Главная</span>
           </Link>
-        )}
 
-        <button onClick={logout}>
-          <FaSignOutAlt />
-          <span>Выход</span>
-        </button>
+          <Link
+            to="/profile"
+            className={location.pathname === "/profile" ? "active" : ""}
+          >
+            <FaUser />
+            <span>Профиль</span>
+          </Link>
 
-      </nav>
-    </div>
+          <Link
+            to="/files"
+            className={location.pathname === "/files" ? "active" : ""}
+          >
+            <FaFolder />
+            <span>Файлы</span>
+          </Link>
+
+          {role === "admin" && (
+            <Link
+              to="/admin"
+              className={location.pathname === "/admin" ? "active" : ""}
+            >
+              <FaUsersCog />
+              <span>Админ</span>
+            </Link>
+          )}
+
+        </nav>
+
+      </div>
+
+      <button
+        className="logout-btn"
+        onClick={logout}
+      >
+        <FaSignOutAlt />
+        <span>Выход</span>
+      </button>
+
+    </aside>
   );
 }
 

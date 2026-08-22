@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api";
 
 import "./Admin.css";
 
@@ -28,215 +28,182 @@ function Admin() {
     files: 0,
     vpn: 0,
   });
+
+  const token = localStorage.getItem("token");
+
+  const auth = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
   const getProfile = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const res = await API.get("/auth/profile", auth);
+      setProfile(res.data.user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    const res = await axios.get(
-      "https://minekey-backend.onrender.com/api/auth/profile",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+  const getUsers = async () => {
+    try {
+      const res = await API.get("/admin/users", auth);
+      setUsers(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getStats = async () => {
+    try {
+      const res = await API.get("/admin/stats", auth);
+
+      setStats({
+        users: Number(res.data.users || 0),
+        files: Number(res.data.files || 0),
+        vpn: Number(res.data.vpn || 0),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const deleteUser = async (id) => {
+    if (!window.confirm("Удалить пользователя?")) return;
+
+    try {
+      const res = await API.delete(`/admin/users/${id}`, auth);
+
+      setMessage(res.data.message);
+
+      getUsers();
+      getStats();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Ошибка удаления");
+    }
+  };
+
+  const blockUser = async (id) => {
+    try {
+      await API.put(`/admin/block/${id}`, {}, auth);
+
+      getUsers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unblockUser = async (id) => {
+    try {
+      await API.put(`/admin/unblock/${id}`, {}, auth);
+
+      getUsers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const saveUser = async () => {
+    try {
+      const res = await API.put(
+        `/admin/users/${editingUser.id}`,
+        {
+          username: editUsername,
+          email: editEmail,
+          role: editRole,
+          ...(editPassword && { password: editPassword }),
         },
-      }
-    );
+        auth
+      );
 
-    setProfile(res.data.user);
-  } catch (err) {
-    console.log(err);
-  }
-};
+      setMessage(res.data.message);
 
-const getUsers = async () => {
-  try {
-    const token = localStorage.getItem("token");
+      setEditingUser(null);
 
-    const res = await axios.get(
-      "https://minekey-backend.onrender.com/api/admin/users",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+      getUsers();
+      getStats();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Ошибка");
+    }
+  };
 
-    setUsers(Array.isArray(res.data) ? res.data : []);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const getStats = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await axios.get(
-      "https://minekey-backend.onrender.com/api/admin/stats",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setStats({
-      users: Number(res.data.users || 0),
-      files: Number(res.data.files || 0),
-      vpn: Number(res.data.vpn || 0),
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-const deleteUser = async (id) => {
-  if (!window.confirm("Удалить пользователя?")) return;
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await axios.delete(
-      `https://minekey-backend.onrender.com/api/admin/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setMessage(res.data.message);
-
+  useEffect(() => {
+    getProfile();
     getUsers();
     getStats();
-
-  } catch (err) {
-    setMessage(
-      err.response?.data?.message || "Ошибка удаления"
-    );
-  }
-};
-const blockUser = async (id) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    await axios.put(
-      `https://minekey-backend.onrender.com/api/admin/block/${id}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    getUsers();
-
-  } catch (err) {
-    console.log(err);
-  }
-};
-const unblockUser = async (id) => {
-  try {
-    const token = localStorage.getItem("token");
-
-    await axios.put(
-      `https://minekey-backend.onrender.com/api/admin/unblock/${id}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    getUsers();
-
-  } catch (err) {
-    console.log(err);
-  }
-};
-const saveUser = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await axios.put(
-      `https://minekey-backend.onrender.com/api/admin/users/${editingUser.id}`,
-      {
-        username: editUsername,
-        email: editEmail,
-        role: editRole,
-        ...(editPassword && { password: editPassword }),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setMessage(res.data.message);
-
-    setEditingUser(null);
-
-    getUsers();
-    getStats();
-
-  } catch (err) {
-    setMessage(
-      err.response?.data?.message || "Ошибка"
-    );
-  }
-};
-useEffect(() => {
-  getProfile();
-  getUsers();
-  getStats();
-}, []);
+  }, []);
 
   return (
-  <div className="admin-page">
-    <h1 className="admin-title">
-    👑 Админ-панель
-</h1>
+    <div className="admin-page">
+      <h1 className="admin-title">
+        👑 Админ-панель
+      </h1>
 
-    <Stats stats={stats} />
+      <Stats stats={stats} />
 
-    <hr />
+      <hr />
 
-    <h3>Все пользователи</h3>
+      <h3>Все пользователи</h3>
 
-    <div className="search-box">
-    <input
-        type="text"
-        placeholder="🔍 Поиск пользователя..."
-        value={search}
-        onChange={(e)=>setSearch(e.target.value)}
-    />
-</div>
+      <div className="search-box">
+        <input
+          type="text"
+          placeholder="🔍 Поиск пользователя..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
-    <br />
-    <br />
+      <br />
+      <br />
 
-    {users.length === 0 ? (
-  <p>Пользователей нет</p>
-) : (
+      {users.length === 0 ? (
+        <p>Пользователей нет</p>
+      ) : (
+        <div className="users-grid">
+          {users
+            .filter(
+              (user) =>
+                user.username
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) ||
+                user.email
+                  .toLowerCase()
+                  .includes(search.toLowerCase())
+            )
+            .map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                profile={profile}
+                editingUser={editingUser}
+                setEditingUser={setEditingUser}
+                editUsername={editUsername}
+                setEditUsername={setEditUsername}
+                editEmail={editEmail}
+                setEditEmail={setEditEmail}
+                editPassword={editPassword}
+                setEditPassword={setEditPassword}
+                editRole={editRole}
+                setEditRole={setEditRole}
+                saveUser={saveUser}
+                deleteUser={deleteUser}
+                blockUser={blockUser}
+                unblockUser={unblockUser}
+              />
+            ))}
+        </div>
+      )}
 
-  <div className="users-grid">
+      <hr />
 
-    {users
-      .filter(
-        (user) =>
-          user.username
-            .toLowerCase()
-            .includes(search.toLowerCase()) ||
-          user.email
-            .toLowerCase()
-            .includes(search.toLowerCase())
-      )
-      .map((user) => (
-        <UserCard
-          key={user.id}
-          user={user}
-          profile={profile}
+      <VpnAdmin />
+
+      {message && <p>{message}</p>}
+
+      {editingUser && (
+        <EditUserModal
           editingUser={editingUser}
           setEditingUser={setEditingUser}
           editUsername={editUsername}
@@ -248,42 +215,10 @@ useEffect(() => {
           editRole={editRole}
           setEditRole={setEditRole}
           saveUser={saveUser}
-          deleteUser={deleteUser}
-          blockUser={blockUser}
-          unblockUser={unblockUser}
         />
-      ))}
-
-  </div>
-
-)}
-    <hr />
-
-    <VpnAdmin />
-
-    {message && <p>{message}</p>}
-    {editingUser && (
-  <EditUserModal
-    editingUser={editingUser}
-    setEditingUser={setEditingUser}
-
-    editUsername={editUsername}
-    setEditUsername={setEditUsername}
-
-    editEmail={editEmail}
-    setEditEmail={setEditEmail}
-
-    editPassword={editPassword}
-    setEditPassword={setEditPassword}
-
-    editRole={editRole}
-    setEditRole={setEditRole}
-
-    saveUser={saveUser}
-  />
-)}
-  </div>
-);
+      )}
+    </div>
+  );
 }
 
 export default Admin;

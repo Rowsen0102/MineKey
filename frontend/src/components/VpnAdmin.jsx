@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api";
 
 function VpnAdmin() {
   const [vpnList, setVpnList] = useState([]);
@@ -9,17 +9,15 @@ function VpnAdmin() {
 
   const token = localStorage.getItem("token");
 
+  const auth = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
   const getVpnList = async () => {
     try {
-      const res = await axios.get(
-        "https://minekey-backend.onrender.com/api/vpn/all",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await API.get("/vpn/all", auth);
       setVpnList(res.data);
     } catch (err) {
       console.log(err);
@@ -34,15 +32,7 @@ function VpnAdmin() {
     if (!window.confirm("Удалить VPN?")) return;
 
     try {
-      await axios.delete(
-        `https://minekey-backend.onrender.com/api/vpn/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await API.delete(`/vpn/${id}`, auth);
       getVpnList();
     } catch (err) {
       console.log(err);
@@ -51,17 +41,13 @@ function VpnAdmin() {
 
   const saveVpn = async () => {
     try {
-      await axios.put(
-        `https://minekey-backend.onrender.com/api/vpn/${editingId}`,
+      await API.put(
+        `/vpn/${editingId}`,
         {
           vpn_key: vpnKey,
           country,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        auth
       );
 
       setEditingId(null);
@@ -78,16 +64,7 @@ function VpnAdmin() {
     if (!window.confirm("Освободить этот VPN?")) return;
 
     try {
-      await axios.put(
-        `https://minekey-backend.onrender.com/api/vpn/release/${id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      await API.put(`/vpn/release/${id}`, {}, auth);
       getVpnList();
     } catch (err) {
       console.log(err);

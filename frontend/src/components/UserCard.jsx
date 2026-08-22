@@ -39,6 +39,7 @@ function UserCard({
 
         <div className="user-info">
           <h3>{user.username}</h3>
+
           <p>{user.email}</p>
 
           <div className="badges">
@@ -61,7 +62,7 @@ function UserCard({
         </div>
       </div>
 
-      {profile.id !== user.id && (
+      {profile && profile.id !== user.id && (
         <>
           <div className="actions">
             <button
@@ -103,16 +104,22 @@ function UserCard({
 
           {editingUser?.id === user.id && (
             <EditUserModal
+              editingUser={editingUser}
+              setEditingUser={setEditingUser}
+
               editUsername={editUsername}
               setEditUsername={setEditUsername}
+
               editEmail={editEmail}
               setEditEmail={setEditEmail}
+
               editPassword={editPassword}
               setEditPassword={setEditPassword}
+
               editRole={editRole}
               setEditRole={setEditRole}
+
               saveUser={saveUser}
-              setEditingUser={setEditingUser}
             />
           )}
         </>

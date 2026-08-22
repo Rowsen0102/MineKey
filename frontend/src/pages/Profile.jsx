@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+import API from "../api";
+
 import Dashboard from "../components/Dashboard";
+
+import "./Profile.css";
 
 function Profile() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
+
   const [stats, setStats] = useState({
-  files: 0,
-  vpn: 0,
-});
-  const [message, setMessage] = useState("");
+    files: 0,
+    vpn: 0,
+  });
 
   const [avatar, setAvatar] = useState(null);
 
@@ -20,7 +24,12 @@ function Profile() {
   const [editProfileEmail, setEditProfileEmail] = useState("");
   const [editProfilePassword, setEditProfilePassword] = useState("");
 
-  const getProfile = async () => {
+  useEffect(() => {
+    loadProfile();
+    loadStats();
+  }, []);
+
+  const loadProfile = async () => {
     try {
       const token = localStorage.getItem("token");
 
@@ -29,8 +38,80 @@ function Profile() {
         return;
       }
 
-      const res = await axios.get(
-        "https://minekey-backend.onrender.com/api/auth/profile",
+      const res = await API.get("/auth/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setProfile(res.data.user);
+
+      setEditProfileUsername(res.data.user.username);
+      setEditProfileEmail(res.data.user.email);
+    } catch (err) {
+      localStorage.clear();
+      navigate("/login");
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await API.get("/auth/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setStats({
+        files: Number(res.data.files || 0),
+        vpn: Number(res.data.vpn || 0),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const uploadAvatar = async () => {
+    if (!avatar) {
+      toast.error("Выберите изображение");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+
+      formData.append("avatar", avatar);
+
+      await API.post("/auth/avatar", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      toast.success("Аватар обновлён");
+
+      loadProfile();
+    } catch (err) {
+      toast.error("Ошибка загрузки");
+    }
+  };
+
+  const saveProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.put(
+        "/auth/profile",
+        {
+          username: editProfileUsername,
+          email: editProfileEmail,
+          password: editProfilePassword,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -38,200 +119,144 @@ function Profile() {
         }
       );
 
-      setProfile(res.data.user);
-      setEditProfileUsername(res.data.user.username);
-      setEditProfileEmail(res.data.user.email);
+      toast.success("Профиль обновлён");
+
+      setEditProfilePassword("");
+
+      loadProfile();
     } catch (err) {
-      localStorage.removeItem("token");
-      navigate("/login");
+      toast.error("Ошибка сохранения");
     }
   };
-  const getStats = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await axios.get(
-      "https://minekey-backend.onrender.com/api/admin/stats",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setStats({
-      files: Number(res.data.files || 0),
-      vpn: Number(res.data.vpn || 0),
-    });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-  useEffect(() => {
-  getProfile();
-  getStats();
-}, []);
 
   const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
+    localStorage.clear();
 
-  toast.success("Вы вышли из аккаунта 👋");
+    toast.success("До встречи!");
 
-  setTimeout(() => {
     navigate("/login");
-  }, 700);
-};
+  };
 
   if (!profile) {
-    return <div className="container">Загрузка...</div>;
-  }
-const uploadAvatar = async () => {
-  if (!avatar) {
-    toast.error("Выберите изображение");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const formData = new FormData();
-    formData.append("avatar", avatar);
-
-    await axios.post(
-      "https://minekey-backend.onrender.com/api/auth/avatar",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    toast.success("Аватар успешно загружен");
-
-    getProfile();
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message || "Ошибка загрузки"
+    return (
+      <div className="container">
+        Загрузка...
+      </div>
     );
   }
-};
-const saveProfile = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    await axios.put(
-      "https://minekey-backend.onrender.com/api/auth/profile",
-      {
-        username: editProfileUsername,
-        email: editProfileEmail,
-        password: editProfilePassword,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    toast.success("Профиль обновлён");
-
-    setEditProfilePassword("");
-
-    getProfile();
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message || "Ошибка сохранения"
-    );
-  }
-};
 
   return (
-    <div className="container">
-        <Dashboard
-  profile={profile}
-  stats={stats}
-/>
-      <h2>Профиль</h2>
+    <div className="container profile-page">
 
-      <p><b>Имя:</b> {profile.username}</p>
-      <p><b>Email:</b> {profile.email}</p>
-      <p><b>Роль:</b> {profile.role}</p>
-
-      <p>
-        <b>Дата регистрации:</b>{" "}
-        {profile.created_at
-          ? new Date(profile.created_at).toLocaleString("ru-RU")
-          : "-"}
-      </p>
-
-      {profile.avatar && (
-        <img
-          src={`https://minekey-backend.onrender.com/uploads/${profile.avatar}`}
-          alt="avatar"
-          style={{
-            width: "120px",
-            height: "120px",
-            borderRadius: "50%",
-            objectFit: "cover",
-            display: "block",
-            marginBottom: "15px",
-          }}
-        />
-      )}
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setAvatar(e.target.files[0])}
+      <Dashboard
+        profile={profile}
+        stats={stats}
       />
 
-      <br /><br />
+      <div className="profile-card">
 
-      <button onClick={uploadAvatar}>
-  Загрузить аватар
-</button>
+        <div className="profile-header">
 
-      <hr />
+          <img
+            className="profile-avatar"
+            src={
+              profile.avatar
+                ? `http://localhost:5000/uploads/${profile.avatar}`
+                : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+            }
+            alt="avatar"
+          />
 
-      <h3>Редактировать профиль</h3>
+          <div className="profile-info">
 
-      <input
-        type="text"
-        value={editProfileUsername}
-        onChange={(e) => setEditProfileUsername(e.target.value)}
-      />
+            <h2>{profile.username}</h2>
 
-      <br /><br />
+            <p>{profile.email}</p>
 
-      <input
-        type="email"
-        value={editProfileEmail}
-        onChange={(e) => setEditProfileEmail(e.target.value)}
-      />
+            <p>
+              <b>Роль:</b> {profile.role}
+            </p>
 
-      <br /><br />
+            <p>
+              <b>Дата регистрации:</b>{" "}
+              {profile.created_at
+                ? new Date(profile.created_at).toLocaleString("ru-RU")
+                : "-"}
+            </p>
 
-      <input
-        type="password"
-        placeholder="Новый пароль"
-        value={editProfilePassword}
-        onChange={(e) => setEditProfilePassword(e.target.value)}
-      />
+          </div>
 
-      <br /><br />
+        </div>
 
-      <button onClick={saveProfile}>
-  Сохранить профиль
-</button>
-      <br /><br />
+        <div className="profile-upload">
 
-      <button onClick={logout}>
-        Выйти
-      </button>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setAvatar(e.target.files[0])}
+          />
+
+          <button
+            className="primary-btn"
+            onClick={uploadAvatar}
+          >
+            📷 Загрузить аватар
+          </button>
+
+        </div>
+
+        <div className="profile-form">
+
+          <h3>Редактировать профиль</h3>
+
+          <input
+            type="text"
+            placeholder="Имя"
+            value={editProfileUsername}
+            onChange={(e) =>
+              setEditProfileUsername(e.target.value)
+            }
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={editProfileEmail}
+            onChange={(e) =>
+              setEditProfileEmail(e.target.value)
+            }
+          />
+
+          <input
+            type="password"
+            placeholder="Новый пароль"
+            value={editProfilePassword}
+            onChange={(e) =>
+              setEditProfilePassword(e.target.value)
+            }
+          />
+
+          <div className="profile-buttons">
+
+            <button
+              className="primary-btn"
+              onClick={saveProfile}
+            >
+              💾 Сохранить
+            </button>
+
+            <button
+              className="logout-btn-profile"
+              onClick={logout}
+            >
+              🚪 Выйти
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   );

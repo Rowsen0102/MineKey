@@ -1,30 +1,37 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
 
 const {
-    addVpnKey,
-    getFreeVpnKey,
-    getAllVpnKeys,
-    deleteVpnKey,
-    updateVpnKey,
-    releaseVpnKey,
-} = require("../controllers/vpnController");
+  uploadFile,
+  getFiles,
+  downloadFile,
+  deleteFile,
+} = require("../controllers/fileController");
 
-const {
-    authMiddleware,
-    isAdmin,
-} = require("../middleware/authMiddleware");
+const { authMiddleware } = require("../middleware/authMiddleware");
 
-// Пользователь
-router.post("/add", authMiddleware, addVpnKey);
-router.get("/get", authMiddleware, getFreeVpnKey);
+const storage = multer.diskStorage({
+  destination: "uploads/",
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
-// Администратор
-router.get("/all", authMiddleware, isAdmin, getAllVpnKeys);
-router.put("/:id", authMiddleware, isAdmin, updateVpnKey);
-router.delete("/:id", authMiddleware, isAdmin, deleteVpnKey);
+const upload = multer({ storage });
 
-// Освободить VPN
-router.put("/release/:id", authMiddleware, isAdmin, releaseVpnKey);
+router.post(
+  "/upload",
+  authMiddleware,
+  upload.single("file"),
+  uploadFile
+);
+
+router.get("/", authMiddleware, getFiles);
+
+router.get("/download/:id", authMiddleware, downloadFile);
+
+router.delete("/:id", authMiddleware, deleteFile);
 
 module.exports = router;
